@@ -1,10 +1,9 @@
-import os
-import sys
 import winreg
+import sys
 
 
 def add_to_startup():
-    exe_path = sys.executable
+    path = sys.executable
 
     key = winreg.OpenKey(
         winreg.HKEY_CURRENT_USER,
@@ -13,6 +12,5 @@ def add_to_startup():
         winreg.KEY_SET_VALUE
     )
 
-    winreg.SetValueEx(key, "StickyNotes", 0, winreg.REG_SZ, exe_path)
-
+    winreg.SetValueEx(key, "StickyNotes", 0, winreg.REG_SZ, path)
     winreg.CloseKey(key)
