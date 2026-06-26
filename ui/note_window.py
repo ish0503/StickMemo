@@ -1,40 +1,36 @@
 from PySide6.QtWidgets import QWidget, QTextEdit, QVBoxLayout
-from PySide6.QtCore import Qt
 
 
 class NoteWindow(QWidget):
 
-    def __init__(self, note_id, data, manager):
+    def __init__(self, data, manager):
         super().__init__()
 
-        self.note_id = note_id
         self.manager = manager
+        self.note_id = data["id"]
 
         self.setWindowTitle("Sticky Note")
-        self.resize(data.get("width", 300), data.get("height", 250))
-        self.move(data.get("x", 200), data.get("y", 200))
+
+        self.resize(data["width"], data["height"])
+        self.move(data["x"], data["y"])
 
         self.text = QTextEdit()
         self.text.setText(data.get("text", ""))
 
-        self.text.textChanged.connect(self.save)
+        self.text.textChanged.connect(self.manager.save)
 
         layout = QVBoxLayout()
         layout.addWidget(self.text)
         layout.setContentsMargins(5, 5, 5, 5)
+
         self.setLayout(layout)
 
-    def save(self):
+    def moveEvent(self, e):
         self.manager.save()
 
-    def moveEvent(self, event):
+    def resizeEvent(self, e):
         self.manager.save()
-        super().moveEvent(event)
 
-    def resizeEvent(self, event):
-        self.manager.save()
-        super().resizeEvent(event)
-
-    def closeEvent(self, event):
-        self.manager.delete_note(self.note_id)
-        event.accept()
+    def closeEvent(self, e):
+        self.manager.delete(self.note_id)
+        e.accept()
