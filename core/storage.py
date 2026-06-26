@@ -1,25 +1,23 @@
 import json
 import os
 
-DATA_FILE = os.path.join("data", "notes.json")
+FILE = "data/notes.json"
 
 
 class Storage:
 
     @staticmethod
-    def load_notes():
-        if not os.path.exists(DATA_FILE):
+    def load():
+        if not os.path.exists(FILE):
+            return []
+        try:
+            with open(FILE, "r", encoding="utf-8") as f:
+                return json.load(f)
+        except:
             return []
 
-        with open(DATA_FILE, "r", encoding="utf-8") as f:
-            try:
-                return json.load(f)
-            except:
-                return []
-
     @staticmethod
-    def save_notes(notes):
+    def save(data):
         os.makedirs("data", exist_ok=True)
-
-        with open(DATA_FILE, "w", encoding="utf-8") as f:
-            json.dump(notes, f, ensure_ascii=False, indent=4)
+        with open(FILE, "w", encoding="utf-8") as f:
+            json.dump(data, f, ensure_ascii=False, indent=2)
