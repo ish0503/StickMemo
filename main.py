@@ -1,28 +1,19 @@
 import sys
 from PySide6.QtWidgets import QApplication
 
-from ui.note_window import NoteWindow
-from core.storage import Storage
+from core.manager import NoteManager
+from ui.tray import Tray
 
 
 def main():
     app = QApplication(sys.argv)
 
-    notes = Storage.load_notes()
+    manager = NoteManager()
 
-    windows = []
+    tray = Tray(manager)
 
-    # 저장된 메모 복원
-    for note in notes:
-        win = NoteWindow(note_id=note["id"], data=note)
-        win.show()
-        windows.append(win)
-
-    # 저장이 하나도 없으면 기본 메모 1개 생성
-    if not windows:
-        win = NoteWindow(note_id=1)
-        win.show()
-        windows.append(win)
+    # 기존 메모 불러오기
+    manager.load_all()
 
     sys.exit(app.exec())
 
