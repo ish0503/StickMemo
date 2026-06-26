@@ -1,29 +1,21 @@
 from PySide6.QtWidgets import QWidget, QTextEdit, QVBoxLayout
 from PySide6.QtCore import Qt
 
-from core.storage import Storage
-
 
 class NoteWindow(QWidget):
 
-    def __init__(self, note_id=None, data=None):
+    def __init__(self, note_id, data, manager):
         super().__init__()
 
         self.note_id = note_id
-        self.data = data or {}
+        self.manager = manager
 
         self.setWindowTitle("Sticky Note")
-        self.resize(
-            self.data.get("width", 300),
-            self.data.get("height", 250)
-        )
-
-        # 위치 복원
-        if "x" in self.data and "y" in self.data:
-            self.move(self.data["x"], self.data["y"])
+        self.resize(data.get("width", 300), data.get("height", 250))
+        self.move(data.get("x", 200), data.get("y", 200))
 
         self.text = QTextEdit()
-        self.text.setText(self.data.get("text", ""))
+        self.text.setText(data.get("text", ""))
 
         self.text.textChanged.connect(self.save)
 
@@ -32,40 +24,17 @@ class NoteWindow(QWidget):
         layout.setContentsMargins(5, 5, 5, 5)
         self.setLayout(layout)
 
-    # 창 이동 감지
+    def save(self):
+        self.manager.save()
+
     def moveEvent(self, event):
-        self.save()
+        self.manager.save()
         super().moveEvent(event)
 
-    # 창 크기 변경 감지
     def resizeEvent(self, event):
-        self.save()
+        self.manager.save()
         super().resizeEvent(event)
 
-    # 자동 저장
-    def save(self):
-        notes = Storage.load_notes()
-
-        found = False
-
-        for n in notes:
-            if n["id"] == self.note_id:
-                n["text"] = self.text.toPlainText()
-                n["x"] = self.x()
-                n["y"] = self.y()
-                n["width"] = self.width()
-                n["height"] = self.height()
-                found = True
-                break
-
-        if not found:
-            notes.append({
-                "id": self.note_id,
-                "text": self.text.toPlainText(),
-                "x": self.x(),
-                "y": self.y(),
-                "width": self.width(),
-                "height": self.height()
-            })
-
-        Storage.save_notes(notes)
+    def closeEvent(self, event):
+        self.manager.delete_note(self.note_id)
+        event.accept()
