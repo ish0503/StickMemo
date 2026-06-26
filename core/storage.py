@@ -1,7 +1,13 @@
-import json
 import os
+import sys
 
-FILE = "data/notes.json"
+def base_path():
+    if getattr(sys, 'frozen', False):
+        return os.path.dirname(sys.executable)
+    return os.path.dirname(os.path.abspath(__file__))
+
+
+FILE = os.path.join(base_path(), "data", "notes.json")
 
 
 class Storage:
