@@ -22,7 +22,6 @@ class NoteWindow(QWidget):
         layout = QVBoxLayout()
         layout.addWidget(self.text)
         layout.setContentsMargins(5, 5, 5, 5)
-
         self.setLayout(layout)
 
     def moveEvent(self, e):
